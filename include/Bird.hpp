@@ -24,6 +24,7 @@ class Bird {
     bool checkCollision(const sf::FloatRect& otherBounds);
     void increaseScore();
     int getScore() const;
+    sf::FloatRect getBounds() const;
 
     const sf::Texture& getBirdTexture() const;
     const sf::Sprite& getBirdSprite() const;

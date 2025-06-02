@@ -6,6 +6,9 @@
 #include "Globals.hpp"
 
 Game::Game(sf::RenderWindow& window) : win(window), scrollSpeed(100.f) {
+    if (!pipeTexture.loadFromFile("assets/pipe.png")) {
+        std::cerr << "Error loading the file" << std::endl;
+    }
     if (!bg_texture.loadFromFile("assets/background-day.png")) {
         std::cerr << "Failed to load background.png\n";
         exit(1);
@@ -27,6 +30,7 @@ void Game::updateBackground(float dt) {
 
     for (int i = 0; i < 2; ++i) {
         if (bg_sprites[i].getPosition().x + bgWidth < 0) {
+            // circular array logic
             int j = (i + 1) % 2;
             bg_sprites[i].setPosition(bg_sprites[j].getPosition().x + bgWidth, 0.f);
         }
@@ -35,6 +39,7 @@ void Game::updateBackground(float dt) {
 
 void Game::startGameLoop() {
     sf::Clock clock;
+
     while (win.isOpen()) {
         float dt = clock.restart().asSeconds();
         sf::Event event;
@@ -49,7 +54,26 @@ void Game::startGameLoop() {
         }
         bird.update(dt);
         updateBackground(dt);
+        spawnTimer += dt;
 
+        if (spawnTimer >= spawnInterval) {
+            pipes.emplace_back(Pipe(pipeTexture));
+            spawnTimer = 0.f;
+        }
+
+        for (auto& pipe : pipes) {
+            pipe.update(dt);
+        }
+        pipes.erase(std::remove_if(pipes.begin(), pipes.end(),
+                                   [](const Pipe& p) { return p.isOffScreen(); }),
+                    pipes.end());
+
+        // check collision
+        for (const auto& pipe : pipes) {
+            if (pipe.checkColision(bird.getBounds())) {
+                std::cout << "collison" << std::endl;
+            }
+        }
         win.clear();
         draw();
         win.display();
@@ -60,4 +84,7 @@ void Game::draw() {
     win.draw(bg_sprites[0]);
     win.draw(bg_sprites[1]);
     bird.draw(win);
+    for (const auto& pipe : pipes) {
+        pipe.Draw(win);
+    }
 }

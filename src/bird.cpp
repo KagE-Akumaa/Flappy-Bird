@@ -19,7 +19,7 @@ Bird::Bird() : velocityY(0.f) {
 
     bird_sprite.setTexture(bird_frames[0]);
     bird_sprite.setScale(SET_SCALE_BIRD_X, SET_SCALE_BIRD_Y);
-    bird_sprite.setPosition(0.f, 15.f);
+    bird_sprite.setPosition(50.f, 15.f);
 }
 
 void Bird::draw(sf::RenderWindow& window) const { window.draw(bird_sprite); }
@@ -41,3 +41,8 @@ void Bird::update(float dt) {
 void Bird::jump() { velocityY = jumpStrength; }
 
 const sf::Sprite& Bird::getBirdSprite() const { return bird_sprite; }
+
+  sf::FloatRect Bird:: getBounds() const
+  {
+    return bird_sprite.getGlobalBounds();
+  }
